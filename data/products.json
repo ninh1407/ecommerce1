@@ -1,0 +1,14 @@
+[
+  {"id":1,"name":"Tivi 55 4K HDR","brand":"Sony","category":"tv","price":12990000,"original":15990000,"size":55,"tech":"HDR","image":"https://images.unsplash.com/photo-1494959764136-6be9eb3c261e?q=80&w=800&auto=format&fit=crop"},
+  {"id":2,"name":"Tivi 65 QLED","brand":"Samsung","category":"tv","price":15990000,"original":19990000,"size":65,"tech":"QLED","image":"https://images.unsplash.com/photo-1527864550417-7f61bda76b52?q=80&w=800&auto=format&fit=crop"},
+  {"id":3,"name":"Điện thoại Galaxy S23","brand":"Samsung","category":"phone","price":19990000,"original":21990000,"tech":"AMOLED 120Hz","image":"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=800&auto=format&fit=crop"},
+  {"id":4,"name":"iPhone 14 128GB","brand":"Apple","category":"phone","price":17990000,"original":19990000,"tech":"OLED","image":"https://images.unsplash.com/photo-1603898037225-87df8e4be3e5?q=80&w=800&auto=format&fit=crop"},
+  {"id":5,"name":"Laptop Gaming 15","brand":"ASUS","category":"laptop","price":22990000,"original":25990000,"size":15.6,"tech":"RTX 4060","image":"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop"},
+  {"id":6,"name":"Laptop Ultrabook 13","brand":"Dell","category":"laptop","price":19990000,"original":22990000,"size":13.3,"tech":"Intel Evo","image":"https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=800&auto=format&fit=crop"},
+  {"id":7,"name":"Tủ lạnh Inverter 300L","brand":"Panasonic","category":"fridge","price":8490000,"original":9990000,"size":300,"tech":"Inverter","image":"https://images.unsplash.com/photo-1586201375754-12185b11c03a?q=80&w=800&auto=format&fit=crop"},
+  {"id":8,"name":"Máy lạnh 1.5HP Inverter","brand":"Daikin","category":"ac","price":8990000,"original":10490000,"power":1.5,"tech":"Inverter","image":"https://images.unsplash.com/photo-1624657965136-2a1f2c97ccbf?q=80&w=800&auto=format&fit=crop"},
+  {"id":9,"name":"Máy giặt 9kg Inverter","brand":"LG","category":"washer","price":6990000,"original":8490000,"size":9,"tech":"Inverter","image":"https://images.unsplash.com/photo-1582582429416-0f38a0f6b9b4?q=80&w=800&auto=format&fit=crop"},
+  {"id":10,"name":"Loa Bluetooth 60W","brand":"JBL","category":"smart","price":2490000,"original":2990000,"power":60,"tech":"Bluetooth 5.0","image":"https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=800&auto=format&fit=crop"},
+  {"id":11,"name":"Máy lọc không khí","brand":"Xiaomi","category":"smart","price":3290000,"original":3990000,"tech":"HEPA","image":"https://images.unsplash.com/photo-1541516160071-0f6c5c7a3ae3?q=80&w=800&auto=format&fit=crop"},
+  {"id":12,"name":"Robot hút bụi","brand":"Ecovacs","category":"smart","price":5990000,"original":6990000,"tech":"Lidar","image":"https://images.unsplash.com/photo-1617531653332-5a5370e79d49?q=80&w=800&auto=format&fit=crop"}
+]
