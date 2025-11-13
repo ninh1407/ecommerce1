@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Import sản phẩm</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a><a href="products.html">Sản phẩm</a></nav></header>
+  <main class="container">
+    <h2>Import từ CSV</h2>
+    <div class="muted">Yêu cầu header: id,name,brand,category,price,original,stock,image,images,description,warranty,delivery. Trường images phân tách bằng dấu |</div>
+    <div class="row" style="margin-top:8px"><input id="csv" type="file" accept=".csv"><button class="btn" id="upload">Tải lên</button></div>
+    <div id="csv-status" class="muted"></div>
+    <h2 style="margin-top:16px">Crawler (Preview)</h2>
+    <div class="row"><input id="c-url" placeholder="URL"><input id="c-name" placeholder="CSS selector tên"><input id="c-price" placeholder="CSS selector giá"><input id="c-image" placeholder="CSS selector ảnh"></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="preview">Preview</button><button class="btn" id="import">Import</button></div>
+    <div id="c-result" class="card"></div>
+  </main>
+  <script type="module">
+    import {api} from '../assets/api.js';
+    function token(){return api.getToken()}
+    document.getElementById('upload').addEventListener('click',async()=>{
+      const f=document.getElementById('csv').files[0];
+      if(!f){document.getElementById('csv-status').textContent='Chưa chọn file';return}
+      const fd=new FormData();fd.append('file',f);
+      const t=token();
+      try{
+        const r=await fetch('http://localhost:3000/api/import/products',{method:'POST',headers:{ ...(t?{Authorization:'Bearer '+t}:{}) },body:fd}).then(r=>r.json());
+        document.getElementById('csv-status').textContent='Imported: '+(r.imported||0);
+      }catch(e){document.getElementById('csv-status').textContent='Import lỗi'}
+    });
+    let previewData=null;
+    document.getElementById('preview').addEventListener('click',async()=>{
+      const url=document.getElementById('c-url').value.trim();
+      const selectors={ name:document.getElementById('c-name').value.trim(), price:document.getElementById('c-price').value.trim(), image:document.getElementById('c-image').value.trim() };
+      if(!url){return}
+      try{const r=await fetch('http://localhost:3000/api/crawl/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,selectors})}).then(r=>r.json());previewData=r;document.getElementById('c-result').innerHTML=`<div><strong>${r.name||''}</strong></div><div>Giá: ${r.price||''}</div><div><img src="${r.image||''}" style="width:200px;height:150px;object-fit:cover"></div>`;}catch(e){document.getElementById('c-result').textContent='Preview lỗi'}
+    });
+    document.getElementById('import').addEventListener('click',async()=>{
+      if(!previewData){return}
+      const t=token();
+      const p={ name:previewData.name, price:previewData.price, image:previewData.image, brand:'', category:'', stock:0 };
+      try{await fetch('http://localhost:3000/api/crawl/import',{method:'POST',headers:{'Content-Type':'application/json', ...(t?{Authorization:'Bearer '+t}:{}) },body:JSON.stringify(p)});alert('Đã import 1 sản phẩm (cần bổ sung brand/category)')}
+      catch(e){alert('Import lỗi')}
+    })
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Khuyến mãi & giảm giá</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a></nav></header>
+  <main class="container">
+    <h2>Mã giảm giá</h2>
+    <div class="row" style="margin-bottom:8px"><input id="id" type="number" placeholder="ID"><input id="code" placeholder="Mã"><input id="percent" type="number" placeholder="%"><input id="note" placeholder="Ghi chú"><button class="btn" id="save">Thêm/Sửa</button></div>
+    <table class="table"><thead><tr><th>ID</th><th>Mã</th><th>%</th><th>Ghi chú</th><th></th></tr></thead><tbody id="list"></tbody></table>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    if(!auth.requireRole('admin')){location.href='./login.html'}
+    function render(){api.getPromos().then(list=>{const tb=document.getElementById('list');tb.innerHTML='';list.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${p.id}</td><td>${p.code}</td><td>${p.percent}</td><td>${p.note||''}</td><td><button class="btn" data-id="${p.id}">Xóa</button></td>`;tb.appendChild(tr)});Array.from(tb.querySelectorAll('button')).forEach(b=>b.addEventListener('click',()=>{api.deletePromo(Number(b.getAttribute('data-id'))).then(render)}))})}
+    render();
+    document.getElementById('save').addEventListener('click',()=>{const p={id:Number(document.getElementById('id').value),code:document.getElementById('code').value,percent:Number(document.getElementById('percent').value),note:document.getElementById('note').value};if(!p.id||!p.code)return;api.upsertPromo(p).then(render)});
+  </script>
+</body>
+</html>
+

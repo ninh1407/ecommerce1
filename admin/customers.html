@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quản lý khách hàng</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a></nav></header>
+  <main class="container">
+    <h2>Khách hàng</h2>
+    <div class="row" style="margin-bottom:8px"><input id="filter" placeholder="Lọc theo tên/SĐT"><button class="btn" id="add">Thêm khách</button></div>
+    <table class="table"><thead><tr><th>ID</th><th>Tên</th><th>Email</th><th>SĐT</th></tr></thead><tbody id="list"></tbody></table>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    if(!auth.requireRole('admin')){location.href='./login.html'}
+    function render(){api.getUsers().then(list=>{const q=document.getElementById('filter').value.toLowerCase();const tb=document.getElementById('list');tb.innerHTML='';list.filter(u=>!q||String(u.name||'').toLowerCase().includes(q)||String(u.phone||'').includes(q)).forEach(u=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${u.id}</td><td>${u.name||u.username}</td><td>${u.email||''}</td><td>${u.phone||''}</td>`;tb.appendChild(tr)})})}
+    render();
+    document.getElementById('filter').addEventListener('input',render);
+    document.getElementById('add').addEventListener('click',()=>{const name=prompt('Tên');const email=prompt('Email');const phone=prompt('SĐT');api.createUser({name,email,phone}).then(render)});
+  </script>
+</body>
+</html>
+

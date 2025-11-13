@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Danh mục sản phẩm</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a></nav></header>
+  <main class="container">
+    <h2>Danh mục</h2>
+    <div class="row" style="margin-bottom:8px"><input id="cid" type="number" placeholder="ID"><input id="cname" placeholder="Tên"><button class="btn" id="save">Thêm/Sửa</button></div>
+    <table class="table"><thead><tr><th>ID</th><th>Tên</th><th></th></tr></thead><tbody id="list"></tbody></table>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    if(!auth.requireRole('admin')){location.href='./login.html'}
+    function render(){api.getCategories().then(list=>{const tb=document.getElementById('list');tb.innerHTML='';list.forEach(c=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${c.id}</td><td>${c.name}</td><td><button class="btn" data-id="${c.id}">Xóa</button></td>`;tb.appendChild(tr)});Array.from(tb.querySelectorAll('button')).forEach(b=>b.addEventListener('click',()=>{api.deleteCategory(Number(b.getAttribute('data-id'))).then(render)}))})}
+    render();
+    document.getElementById('save').addEventListener('click',()=>{const c={id:Number(cid.value),name:cname.value};if(!c.id||!c.name)return;api.upsertCategory(c).then(render)});
+  </script>
+</body>
+</html>
+

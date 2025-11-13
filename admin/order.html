@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chi tiết đơn hàng</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="orders.html">Đơn hàng</a></nav></header>
+  <main class="container">
+    <h2>Đơn hàng <span id="oid"></span></h2>
+    <div id="meta"></div>
+    <table class="table"><thead><tr><th>ID SP</th><th>Tên</th><th>Giá</th><th>SL</th><th>Tạm tính</th></tr></thead><tbody id="items"></tbody></table>
+    <div class="row" style="margin-top:12px"><select id="status"><option>Chưa xử lý</option><option>Đang vận chuyển</option><option>Đã giao</option><option>Hoàn trả</option><option>Đã hủy</option></select><button class="btn" id="save">Lưu trạng thái</button></div>
+    <div style="margin-top:12px"><h3>Hoàn trả</h3><div class="row"><input id="reason" placeholder="Lý do hoàn trả"><button class="btn" id="saveReturn">Lưu lý do</button></div><div id="ret"></div></div>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    if(!auth.requireRole('admin')){location.href='./login.html'}
+    const id=new URL(location.href).searchParams.get('id');
+    document.getElementById('oid').textContent=id;
+    Promise.all([api.listOrders(),api.getProducts()]).then(([orders,products])=>{
+      const o=orders.find(x=>String(x.id)===String(id));
+      if(!o){document.getElementById('meta').textContent='Không tìm thấy đơn';return}
+      document.getElementById('meta').innerHTML=`<div class="muted">Mã đơn: ${o.orderCode||''} • SĐT: ${o.phone||''} • Giá trị: ${new Intl.NumberFormat('vi-VN').format(o.amount||0)}₫ • Thanh toán: ${o.method||''}</div>`;
+      const tb=document.getElementById('items');
+      tb.innerHTML='';
+      (o.items||[]).forEach(i=>{const p=products.find(x=>x.id===i.id)||{name:'(đã xóa)',price:0};const tr=document.createElement('tr');tr.innerHTML=`<td>${i.id}</td><td>${p.name}</td><td>${new Intl.NumberFormat('vi-VN').format(p.price)}₫</td><td>${i.qty}</td><td>${new Intl.NumberFormat('vi-VN').format((p.price||0)*i.qty)}₫</td>`;tb.appendChild(tr)});
+      const sel=document.getElementById('status');sel.value=o.status||'Chưa xử lý';
+      document.getElementById('save').addEventListener('click',()=>{api.updateOrderStatus(o.id,sel.value)});
+      const ret=document.getElementById('ret');ret.textContent=o.returnReason||'';
+      document.getElementById('saveReturn').addEventListener('click',()=>{const list=orders;const it=list.find(x=>x.id===o.id);if(it){it.returnReason=reason.value;localStorage.setItem('orders',JSON.stringify(list));ret.textContent=it.returnReason}});
+    });
+  </script>
+</body>
+</html>
+

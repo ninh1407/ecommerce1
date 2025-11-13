@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Đăng nhập Admin</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div></header>
+  <main class="container">
+    <h2>Đăng nhập</h2>
+    <div class="row"><input id="email" placeholder="Email" value="admin@example.com"></div>
+    <div class="row" style="margin-top:8px"><input id="password" type="password" placeholder="Mật khẩu" value="admin123"></div>
+    <div class="row" style="margin-top:8px"><input id="code" placeholder="Mã 2FA (nếu bật)"></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="login">Đăng nhập</button><button class="btn" id="reset">Quên mật khẩu</button></div>
+    <div class="muted" id="status"></div>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    const email=document.getElementById('email');
+    const pass=document.getElementById('password');
+    const code=document.getElementById('code');
+    const s=document.getElementById('status');
+    document.getElementById('login').addEventListener('click',async()=>{
+      try{
+        const r=await api.login(email.value.trim(),pass.value.trim());
+        if(r && r.token){location.href='./index.html';return}
+      }catch(e){}
+      const res=auth.login(email.value.trim(),pass.value.trim());
+      if(res.ok){location.href='./index.html'}
+      else if(res.twofa){alert('Mã 2FA demo đã được tạo. Vui lòng nhập vào ô Mã 2FA.');
+        code.focus();
+        document.getElementById('login').textContent='Xác thực 2FA';
+        document.getElementById('login').onclick=()=>{
+          if(auth.verify2fa(code.value.trim(),res.session)){location.href='./index.html'} else {s.textContent='Sai mã 2FA'}
+        };
+      } else {s.textContent='Sai thông tin đăng nhập'}
+    });
+    document.getElementById('reset').addEventListener('click',()=>{
+      const token=auth.startReset(email.value.trim());
+      if(!token){s.textContent='Không tìm thấy email'} else {alert('Link đặt lại mật khẩu (demo token): '+token)}
+    });
+  </script>
+</body>
+</html>

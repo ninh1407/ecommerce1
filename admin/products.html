@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quản lý sản phẩm</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a><a href="orders.html">Đơn hàng</a></nav></header>
+  <main class="container">
+    <h2>Sản phẩm</h2>
+    <div class="row" style="margin-bottom:8px">
+      <input id="id" type="number" placeholder="ID">
+      <input id="name" placeholder="Tên">
+      <input id="brand" placeholder="Thương hiệu">
+      <select id="category"></select>
+      <input id="price" type="number" placeholder="Giá">
+      <input id="stock" type="number" placeholder="Tồn kho">
+      <input id="image" placeholder="Ảnh chính">
+      <input id="images" placeholder="Ảnh chi tiết (phân cách bằng dấu ,)">
+      <input id="upload" type="file" multiple accept="image/*">
+      <div id="preview" class="row"></div>
+      <button class="btn" id="save">Thêm/Sửa</button>
+    </div>
+    <table class="table"><thead><tr><th>ID</th><th>Tên</th><th>Giá</th><th>Danh mục</th><th></th></tr></thead><tbody id="list"></tbody></table>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    const me=auth.current();
+    if(!auth.requireAny(['admin','bien-tap','nhan-vien-kho'])){location.href='./login.html'}
+    function renderCats(){api.getCategories().then(cats=>{const sel=document.getElementById('category');sel.innerHTML=cats.map(c=>`<option value="${c.name}">${c.name}</option>`).join('')})}
+    function render(){api.getProducts().then(ps=>{const tb=document.getElementById('list');tb.innerHTML='';ps.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${p.id}</td><td>${p.name}</td><td>${new Intl.NumberFormat('vi-VN').format(p.price)}₫</td><td>${p.category}</td><td><button class="btn" data-id="${p.id}">Xóa</button></td>`;tb.appendChild(tr)});Array.from(tb.querySelectorAll('button')).forEach(b=>b.addEventListener('click',()=>{api.deleteProduct(Number(b.getAttribute('data-id'))).then(render)}))})}
+    renderCats();
+    render();
+    const up=document.getElementById('upload');
+    up.addEventListener('change',async()=>{
+      const files=Array.from(up.files||[]);
+      const pv=document.getElementById('preview');
+      pv.innerHTML='';
+      if(files.length){
+        try{
+          const fd=new FormData();files.slice(0,6).forEach(f=>fd.append('files',f));
+          const token=localStorage.getItem('jwt')||'';
+          const res= await fetch('http://localhost:3000/api/upload',{method:'POST',headers:{ ...(token?{Authorization:'Bearer '+token}:{}) },body:fd}).then(r=>r.json());
+          const urls = Array.isArray(res.files)?res.files:[];
+          document.getElementById('images').value = urls.join(',');
+          urls.forEach(u=>{const img=document.createElement('img');img.src=u;img.style.width='64px';img.style.height='48px';img.style.objectFit='cover';img.style.border='1px solid #e5eaf2';img.style.borderRadius='8px';pv.appendChild(img)});
+        }catch(e){
+          files.slice(0,6).forEach(f=>{const r=new FileReader();r.onload=()=>{const img=document.createElement('img');img.src=r.result;img.style.width='64px';img.style.height='48px';img.style.objectFit='cover';img.style.border='1px solid #e5eaf2';img.style.borderRadius='8px';pv.appendChild(img);const cur=document.getElementById('images').value;document.getElementById('images').value = (cur?cur+',' : '') + r.result};r.readAsDataURL(f)});
+        }
+      }
+    });
+    document.getElementById('save').addEventListener('click',()=>{
+      const p={
+        id:Number(document.getElementById('id').value),
+        name:document.getElementById('name').value,
+        brand:document.getElementById('brand').value,
+        category:document.getElementById('category').value,
+        price:Number(document.getElementById('price').value),
+        stock:Number(document.getElementById('stock').value||0),
+        image:document.getElementById('image').value,
+        images:document.getElementById('images').value.split(',').map(x=>x.trim()).filter(Boolean)
+      };
+      if(!p.id||!p.name)return;
+      if(me.role==='nhan-vien-kho'){api.upsertProduct({id:p.id,stock:p.stock}).then(render)}
+      else if(me.role==='bien-tap'){api.upsertProduct({id:p.id,name:p.name,brand:p.brand,category:p.category,image:p.image,images:p.images}).then(render)}
+      else {api.upsertProduct(p).then(render)}
+    });
+    if(me.role==='nhan-vien-kho'){name.disabled=true;brand.disabled=true;category.disabled=true;price.disabled=true;image.disabled=true;images.disabled=true;upload.disabled=true}
+    if(me.role==='bien-tap'){stock.disabled=true;price.disabled=true}
+  </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Siêu thị điện máy | Giá tốt, giao nhanh</title>
+  <meta name="description" content="Mua sắm Điện thoại, Laptop, Tivi, Điện lạnh giá tốt. Nhiều khuyến mãi, giao nhanh trong ngày.">
+  <link rel="canonical" href="http://localhost:8000/">
+  <meta property="og:title" content="Siêu thị điện máy | Giá tốt, giao nhanh">
+  <meta property="og:description" content="Khuyến mãi lớn, trả góp 0%">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-top">
+      <a class="brand" href="index.html">DienMay</a>
+      <div class="search">
+        <input id="search-input" placeholder="Bạn tìm gì hôm nay?">
+        <button id="search-btn">Tìm kiếm</button>
+      </div>
+      <nav class="actions">
+        <a href="cart.html" class="btn">Giỏ hàng</a>
+        <a href="checkout.html" class="btn">Thanh toán</a>
+      </nav>
+    </div>
+    <div class="menu">
+      <div class="mega">
+        <a href="products.html">Danh mục</a>
+        <div class="mega-panel">
+          <div class="mega-grid">
+            <div class="mega-group">
+              <h3>Tivi - Âm thanh</h3>
+              <a href="products.html?cat=tv">Tivi</a>
+              <a href="products.html?cat=smart">Loa, Soundbar</a>
+            </div>
+            <div class="mega-group">
+              <h3>Điện thoại - Laptop</h3>
+              <a href="products.html?cat=phone">Điện thoại</a>
+              <a href="products.html?cat=laptop">Laptop</a>
+            </div>
+            <div class="mega-group">
+              <h3>Điện lạnh</h3>
+              <a href="products.html?cat=fridge">Tủ lạnh</a>
+              <a href="products.html?cat=ac">Máy lạnh</a>
+              <a href="products.html?cat=washer">Máy giặt</a>
+            </div>
+            <div class="mega-group">
+              <h3>Nhà thông minh</h3>
+              <a href="products.html?cat=smart">Thiết bị thông minh</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a href="compare.html">So sánh</a>
+      <a href="stores.html">Cửa hàng gần bạn</a>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-slide active" style="background:url('https://via.placeholder.com/1200x300/0072ff/ffffff?text=Cuoi+nam+giam+50%25') center/cover">Ưu đãi cuối năm</div>
+      <div class="hero-slide" style="background:url('https://via.placeholder.com/1200x300/ff6f00/ffffff?text=Black+Friday+Soc') center/cover">Black Friday</div>
+      <div class="hero-slide" style="background:url('https://via.placeholder.com/1200x300/2bb52b/ffffff?text=Tra+gop+0%25') center/cover">Trả góp 0%</div>
+      <div class="hero-dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+    </section>
+    <section class="categories">
+      <a class="cat" href="products.html?cat=phone">Điện thoại</a>
+      <a class="cat" href="products.html?cat=laptop">Laptop</a>
+      <a class="cat" href="products.html?cat=tv">Tivi</a>
+      <a class="cat" href="products.html?cat=fridge">Tủ lạnh</a>
+      <a class="cat" href="products.html?cat=ac">Máy lạnh</a>
+      <a class="cat" href="products.html?cat=washer">Máy giặt</a>
+    </section>
+    <section class="section">
+      <h2>Sản phẩm nổi bật</h2>
+      <div id="home-products" class="grid"></div>
+    </section>
+  </main>
+  <footer class="footer">Gọi mua: 1800 0000 • Hỗ trợ: 1800 1111 • Mở cửa 8:00 - 22:00</footer>
+  <script type="module" src="assets/app.js"></script>
+  <script>
+    const slides=Array.from(document.querySelectorAll('.hero-slide'));
+    const dots=Array.from(document.querySelectorAll('.dot'));
+    let i=0;setInterval(()=>{slides[i].classList.remove('active');dots[i].classList.remove('active');i=(i+1)%slides.length;slides[i].classList.add('active');dots[i].classList.add('active')},3500);
+  </script>
+</body>
+</html>

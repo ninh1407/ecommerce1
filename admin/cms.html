@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quản lý nội dung</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a></nav></header>
+  <main class="container">
+    <h2>Bài viết/Tin tức</h2>
+    <div class="row" style="margin-bottom:8px"><input id="pid" type="number" placeholder="ID"><input id="title" placeholder="Tiêu đề"><input id="content" placeholder="Nội dung"><button class="btn" id="save">Thêm/Sửa</button></div>
+    <table class="table"><thead><tr><th>ID</th><th>Tiêu đề</th><th></th></tr></thead><tbody id="list"></tbody></table>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    if(!(auth.requireRole('admin')||auth.requireRole('bien-tap'))){location.href='./login.html'}
+    function render(){api.getPosts().then(list=>{const tb=document.getElementById('list');tb.innerHTML='';list.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${p.id}</td><td>${p.title}</td><td><button class="btn" data-id="${p.id}">Xóa</button></td>`;tb.appendChild(tr)});Array.from(tb.querySelectorAll('button')).forEach(b=>b.addEventListener('click',()=>{api.deletePost(Number(b.getAttribute('data-id'))).then(render)}))})}
+    render();
+    document.getElementById('save').addEventListener('click',()=>{const p={id:Number(document.getElementById('pid').value),title:document.getElementById('title').value,content:document.getElementById('content').value};if(!p.id||!p.title)return;api.upsertPost(p).then(render)});
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Thanh toán</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-top">
+      <a class="brand" href="index.html">DienMay</a>
+      <nav class="actions">
+        <a href="cart.html" class="btn">Giỏ hàng</a>
+      </nav>
+    </div>
+  </header>
+  <main class="list">
+    <h2>Thanh toán</h2>
+    <div class="summary"><div>Tổng đơn</div><div id="total"></div></div>
+    <p class="muted">Vui lòng quét mã VietQR để chuyển khoản. Nội dung chuyển: mã đơn + số điện thoại.</p>
+    <div id="qr"></div>
+  </main>
+  <footer class="footer">Hotline: 1800 0000</footer>
+  <script src="vietqr.js"></script>
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>

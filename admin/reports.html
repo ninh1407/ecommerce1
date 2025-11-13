@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Báo cáo</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a></nav></header>
+  <main class="container">
+    <h2>Báo cáo bán hàng</h2>
+    <div id="sales"></div>
+    <h2 style="margin-top:16px">Báo cáo tồn kho</h2>
+    <div id="inv"></div>
+    <h2 style="margin-top:16px">Báo cáo khách hàng</h2>
+    <div id="cust"></div>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    if(!auth.requireRole('admin')){location.href='./login.html'}
+    Promise.all([api.listOrders(),api.getInventory(),api.getUsers()]).then(([orders,inv,users])=>{
+      const byDay={};orders.forEach(o=>{const k=String(o.createdAt||'').slice(0,10);byDay[k]=(byDay[k]||0)+(o.amount||0)});
+      document.getElementById('sales').innerHTML='<table class="table"><thead><tr><th>Ngày</th><th>Doanh thu</th></tr></thead><tbody>'+Object.entries(byDay).map(([k,v])=>`<tr><td>${k}</td><td>${new Intl.NumberFormat('vi-VN').format(v)}₫</td></tr>`).join('')+'</tbody></table>';
+      document.getElementById('inv').innerHTML='<table class="table"><thead><tr><th>ID</th><th>Tồn</th></tr></thead><tbody>'+inv.map(i=>`<tr><td>${i.id}</td><td>${i.stock||0}</td></tr>`).join('')+'</tbody></table>';
+      document.getElementById('cust').innerHTML='<table class="table"><thead><tr><th>ID</th><th>Tên</th></tr></thead><tbody>'+users.map(u=>`<tr><td>${u.id}</td><td>${u.name||u.username}</td></tr>`).join('')+'</tbody></table>';
+    });
+  </script>
+</body>
+</html>
+

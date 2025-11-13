@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quản lý người dùng</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a></nav></header>
+  <main class="container">
+    <h2>Người dùng</h2>
+    <div class="row" style="margin-bottom:8px">
+      <input id="uid" type="number" placeholder="ID (để sửa)">
+      <input id="name" placeholder="Tên">
+      <input id="email" placeholder="Email">
+      <input id="phone" placeholder="SĐT">
+      <select id="role"><option>admin</option><option>bien-tap</option><option>nhan-vien-kho</option></select>
+      <input id="password" placeholder="Mật khẩu">
+      <button class="btn" id="save">Thêm/Sửa</button>
+    </div>
+    <div class="row" style="margin-bottom:8px">
+      <input id="newPass" placeholder="Mật khẩu mới">
+      <button class="btn" id="change">Đổi mật khẩu</button>
+      <label class="row" style="gap:6px"><input type="checkbox" id="twofa">Bật 2FA</label>
+    </div>
+    <table class="table"><thead><tr><th>ID</th><th>Tên</th><th>Email</th><th>Vai trò</th></tr></thead><tbody id="list"></tbody></table>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    auth.init();
+    if(!auth.requireRole('admin')){location.href='./login.html'}
+    function render(){const list=JSON.parse(localStorage.getItem('users')||'[]');const tb=document.getElementById('list');tb.innerHTML='';list.forEach(u=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${u.id}</td><td>${u.name||''}</td><td>${u.email}</td><td>${u.role}</td>`;tb.appendChild(tr)});}
+    render();
+    document.getElementById('save').addEventListener('click',()=>{const u={id:Number(uid.value)||undefined,name:name.value,email:email.value,phone:phone.value,role:role.value,password:password.value};auth.upsertUser(u);render()});
+    document.getElementById('change').addEventListener('click',()=>{const id=Number(uid.value);if(!id)return;auth.changePassword(id,newPass.value)});
+    document.getElementById('twofa').addEventListener('change',()=>{const id=Number(uid.value);if(!id){alert('Nhập ID người dùng');twofa.checked=false;return}auth.toggle2fa(id,twofa.checked)});
+  </script>
+</body>
+</html>
+

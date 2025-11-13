@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Quản lý đơn hàng</title>
+  <link rel="stylesheet" href="../assets/admin.css">
+</head>
+<body>
+  <header class="admin-header"><div>Admin</div><nav class="admin-nav"><a href="index.html">Dashboard</a><a href="products.html">Sản phẩm</a></nav></header>
+  <main class="container">
+    <h2>Đơn hàng</h2>
+    <table class="table"><thead><tr><th>ID</th><th>Mã đơn</th><th>SĐT</th><th>Giá trị</th><th>Trạng thái</th><th></th></tr></thead><tbody id="orders"></tbody></table>
+  </main>
+  <script type="module">
+    import {auth} from '../assets/auth.js';
+    import {api} from '../assets/api.js';
+    auth.init();
+    if(!auth.requireRole('admin')){location.href='./login.html'}
+    function render(){api.listOrders().then(list=>{const tb=document.getElementById('orders');tb.innerHTML='';list.sort((a,b)=>b.id-a.id).forEach(o=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${o.id}</td><td>${o.orderCode||''}</td><td>${o.phone||''}</td><td>${new Intl.NumberFormat('vi-VN').format(o.amount||0)}₫</td><td><select data-id="${o.id}"><option>Chưa xử lý</option><option>Đang vận chuyển</option><option>Đã giao</option><option>Hoàn trả</option><option>Đã hủy</option></select></td><td><a class="btn" href="order.html?id=${o.id}">Chi tiết</a></td>`;tb.appendChild(tr);const sel=tr.querySelector('select');sel.value=o.status||'Chưa xử lý';sel.addEventListener('change',()=>{api.updateOrderStatus(o.id,sel.value)})});})}
+    render();
+  </script>
+</body>
+</html>

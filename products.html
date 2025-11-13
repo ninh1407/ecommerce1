@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Danh mục sản phẩm | Giá tốt</title>
+  <meta name="description" content="Xem sản phẩm theo danh mục, lọc theo thương hiệu, giá, công nghệ.">
+  <link rel="canonical" href="http://localhost:8000/products.html">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-top">
+      <a class="brand" href="index.html">DienMay</a>
+      <div class="search">
+        <input id="search-input" placeholder="Bạn tìm gì hôm nay?">
+        <button id="search-btn">Tìm kiếm</button>
+      </div>
+      <nav class="actions">
+        <a href="cart.html" class="btn">Giỏ hàng</a>
+      </nav>
+    </div>
+  </header>
+  <main class="list">
+    <div class="filters">
+      <select id="filter-brand">
+        <option value="">Thương hiệu</option>
+        <option>Samsung</option>
+        <option>Apple</option>
+        <option>Sony</option>
+        <option>ASUS</option>
+        <option>Dell</option>
+        <option>Panasonic</option>
+        <option>Daikin</option>
+        <option>LG</option>
+        <option>JBL</option>
+        <option>Xiaomi</option>
+        <option>Ecovacs</option>
+      </select>
+      <input id="min" type="number" placeholder="Giá từ">
+      <input id="max" type="number" placeholder="Đến">
+      <input id="sizeMin" type="number" step="0.1" placeholder="Kích thước từ">
+      <input id="sizeMax" type="number" step="0.1" placeholder="Đến">
+      <input id="powerMin" type="number" step="0.1" placeholder="Công suất từ">
+      <input id="powerMax" type="number" step="0.1" placeholder="Đến">
+      <input id="tech" placeholder="Công nghệ">
+      <button class="btn" id="apply">Lọc</button>
+    </div>
+    <div id="status" class="muted" style="margin-bottom:8px"></div>
+    <div id="product-list" class="grid"></div>
+  </main>
+  <footer class="footer">Hotline: 1800 0000</footer>
+  <script>
+    (function(){
+      var s=document.getElementById('status');
+      if(s){
+        s.textContent='Đang kiểm tra API...';
+        fetch('http://localhost:3000/api/products')
+          .then(function(r){return r.json()})
+          .then(function(d){s.textContent='API: '+(Array.isArray(d)?d.length:0)+' sản phẩm'})
+          .catch(function(){s.textContent='API lỗi, dùng dữ liệu cục bộ'});
+      }
+    })();
+    window.addEventListener('error',function(e){
+      var s=document.getElementById('status');
+      if(s){s.textContent='Lỗi script: '+(e.message||'')}
+    });
+    setTimeout(function(){
+      var grid=document.getElementById('product-list');
+      if(!grid)return;
+      if(grid.children.length>0)return;
+      var s=document.getElementById('status');
+      var u=new URL(location.href);
+      var cat=(u.searchParams.get('cat')||'').toLowerCase();
+      var brand=(u.searchParams.get('brand')||'').toLowerCase();
+      var min=Number(u.searchParams.get('min')||0);
+      var max=Number(u.searchParams.get('max')||0);
+      function applyFilter(list){
+        return (list||[]).filter(function(p){
+          var catOk=!cat||String(p.category||'').toLowerCase()===cat;
+          var brandOk=!brand||String(p.brand||'').toLowerCase()===brand;
+          var priceOk=(!min||Number(p.price||0)>=min)&&(!max||Number(p.price||0)<=max);
+          return catOk&&brandOk&&priceOk;
+        });
+      }
+      function card(p){
+        var d=document.createElement('div');
+        d.className='card';
+        d.innerHTML='<a href="product.html?id='+encodeURIComponent(p.id)+'"><img src="'+(p.image||'')+'" alt="'+(p.name||'')+'"></a><div class="card-body"><div class="title">'+(p.name||'')+'</div><div class="row"><div class="price">'+(p.price||0).toLocaleString('vi-VN')+'₫</div>'+(p.original?'<div class="strike">'+p.original.toLocaleString('vi-VN')+'₫</div>':'')+'</div><div class="row"><span class="badge">Trả góp 0%</span></div><button class="btn" data-id="'+p.id+'">Thêm vào giỏ</button><a class="btn" href="cart.html" style="margin-left:8px">Giỏ hàng</a></div>';
+        return d;
+      }
+      fetch('http://localhost:3000/api/products')
+        .then(function(r){return r.json()})
+        .then(function(list){
+          var filtered=applyFilter(list);
+          grid.innerHTML='';
+          (filtered||[]).forEach(function(p){var c=card(p);grid.appendChild(c);var b=c.querySelector('button[data-id]');if(b){b.addEventListener('click',function(){try{var id=Number(b.getAttribute('data-id'));var cart=JSON.parse(localStorage.getItem('cart')||'[]');var it=cart.find(function(x){return x.id===id});if(it){it.qty=(it.qty||1)+1}else{cart.push({id:id,qty:1})}localStorage.setItem('cart',JSON.stringify(cart));alert('Đã thêm vào giỏ')}catch(e){}})}});
+          grid.dataset.lock='1';
+          if(s)s.textContent=(filtered||[]).length+' sản phẩm'
+        })
+        .catch(function(){
+          fetch('data/products.json')
+            .then(function(r){return r.json()})
+            .then(function(list){
+              var filtered=applyFilter(list);
+              grid.innerHTML='';
+              (filtered||[]).forEach(function(p){var c=card(p);grid.appendChild(c);var b=c.querySelector('button[data-id]');if(b){b.addEventListener('click',function(){try{var id=Number(b.getAttribute('data-id'));var cart=JSON.parse(localStorage.getItem('cart')||'[]');var it=cart.find(function(x){return x.id===id});if(it){it.qty=(it.qty||1)+1}else{cart.push({id:id,qty:1})}localStorage.setItem('cart',JSON.stringify(cart));alert('Đã thêm vào giỏ')}catch(e){}})}});
+              grid.dataset.lock='1';
+              if(s)s.textContent=(filtered||[]).length+' sản phẩm'
+            })
+            .catch(function(){if(s)s.textContent='Lỗi tải dữ liệu'});
+        });
+    },800);
+  </script>
+  <script type="module" src="assets/app.js"></script>
+  <script>
+    document.getElementById('apply').addEventListener('click',()=>{
+      const b=document.getElementById('filter-brand').value;
+      const min=document.getElementById('min').value;
+      const max=document.getElementById('max').value;
+      const sizeMin=document.getElementById('sizeMin').value;
+      const sizeMax=document.getElementById('sizeMax').value;
+      const powerMin=document.getElementById('powerMin').value;
+      const powerMax=document.getElementById('powerMax').value;
+      const tech=document.getElementById('tech').value;
+      const u=new URL(location.href);
+      if(b)u.searchParams.set('brand',b);else u.searchParams.delete('brand');
+      if(min)u.searchParams.set('min',min);else u.searchParams.delete('min');
+      if(max)u.searchParams.set('max',max);else u.searchParams.delete('max');
+      if(sizeMin)u.searchParams.set('sizeMin',sizeMin);else u.searchParams.delete('sizeMin');
+      if(sizeMax)u.searchParams.set('sizeMax',sizeMax);else u.searchParams.delete('sizeMax');
+      if(powerMin)u.searchParams.set('powerMin',powerMin);else u.searchParams.delete('powerMin');
+      if(powerMax)u.searchParams.set('powerMax',powerMax);else u.searchParams.delete('powerMax');
+      if(tech)u.searchParams.set('tech',tech);else u.searchParams.delete('tech');
+      location.href=u.toString();
+    })
+  </script>
+</body>
+</html>

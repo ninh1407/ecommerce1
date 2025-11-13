@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cửa hàng gần bạn | Tìm siêu thị</title>
+  <meta name="description" content="Tìm siêu thị điện máy gần bạn, xem địa chỉ và hotline.">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-top">
+      <a class="brand" href="index.html">DienMay</a>
+      <nav class="actions">
+        <a href="index.html" class="btn">Trang chủ</a>
+      </nav>
+    </div>
+  </header>
+  <main class="list">
+    <h2>Cửa hàng gần bạn</h2>
+    <div id="stores"></div>
+  </main>
+  <footer class="footer">Hotline: 1800 0000</footer>
+  <script type="module">
+    import {api} from './assets/api.js'
+    function dist(a,b){const R=6371;const dLat=(b.lat-a.lat)*Math.PI/180;const dLng=(b.lng-a.lng)*Math.PI/180;const la=a.lat*Math.PI/180;const lb=b.lat*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.sin(dLng/2)**2*Math.cos(la)*Math.cos(lb);return 2*R*Math.asin(Math.sqrt(x))}
+    function render(list,me){const el=document.getElementById('stores');const s=list.map(x=>({item:x,d:me?dist(me,{lat:x.lat,lng:x.lng}):null})).sort((a,b)=>{if(a.d==null)return 0;return a.d-b.d});el.innerHTML=s.map(({item,d})=>`<div style="padding:10px;border-bottom:1px solid #eef2f7"><div class="row" style="justify-content:space-between"><strong>${item.name}</strong><span>${d?d.toFixed(1)+' km':''}</span></div><div>${item.address}</div><div>${item.phone}</div></div>`).join('')}
+    navigator.geolocation.getCurrentPosition(pos=>{api.getStores().then(list=>{render(list,{lat:pos.coords.latitude,lng:pos.coords.longitude})})},err=>{api.getStores().then(list=>{render(list,null)})},{timeout:5000})
+  </script>
+</body>
+</html>
